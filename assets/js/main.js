@@ -93,18 +93,18 @@
 
 			}
 
-	// Main Sections: Two.
+	// Publications gallery.
 
 		// Lightbox gallery.
 			$window.on('load', function() {
 
-				$('#two').poptrox({
-					caption: function($a) { return $a.next('h3').text(); },
+				$('#publications').poptrox({
+					caption: function($a) { return $a.closest('.publication-item').find('h3').text(); },
 					overlayColor: '#2c2c2c',
 					overlayOpacity: 0.85,
 					popupCloserText: '',
 					popupLoaderText: '',
-					selector: '.work-item a.image',
+					selector: '.publication-item a.image',
 					usePopupCaption: true,
 					usePopupDefaultStyling: false,
 					usePopupEasyClose: false,

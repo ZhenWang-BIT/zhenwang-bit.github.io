@@ -117,9 +117,13 @@ input, select, textarea {
 
 		a:hover {
 			border-bottom-color: transparent;
-			color: #ffffff !important;
-			text-decoration: none;
-		}
+		color: #ffffff !important;
+		text-decoration: none;
+	}
+
+	#main a:hover {
+		color: #1f8f77 !important;
+	}
 
 	mylink {
 		color: #49bf9d;
@@ -148,6 +152,12 @@ input, select, textarea {
 	name {
 		color: #787878;
 		font-weight: 400;
+	}
+
+	.lead {
+		color: #555555;
+		font-size: 1.1em;
+		line-height: 1.65em;
 	}
 
 	em, i {
@@ -2166,7 +2176,10 @@ input, select, textarea {
 			}
 
 			.image.avatar img {
+				aspect-ratio: 1 / 1;
 				border-radius: 100%;
+				height: auto;
+				object-fit: cover;
 				width: 100%;
 			}
 
@@ -2596,6 +2609,154 @@ input, select, textarea {
 			margin: 0;
 		}
 
+/* CV Page */
+
+	#nav {
+		margin: 0 0 2em 0;
+	}
+
+		#nav ul {
+			list-style: none;
+			margin: 0;
+			padding: 0;
+		}
+
+		#nav li {
+			margin: 0.35em 0;
+			padding: 0;
+		}
+
+		#nav a {
+			border: 0;
+			color: rgba(255, 255, 255, 0.72);
+			font-size: 0.95em;
+			font-weight: 600;
+			letter-spacing: 0;
+		}
+
+			#nav a:hover {
+				color: #ffffff !important;
+			}
+
+	.header-subtitle {
+		color: rgba(255, 255, 255, 0.72);
+		font-size: 0.9em;
+		line-height: 1.45em;
+		margin: 1.25em 0 0 0;
+	}
+
+	.header-icons {
+		margin: 0;
+	}
+
+	.news-list {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+
+		.news-list li {
+			align-items: baseline;
+			border-left: solid 3px #49bf9d;
+			display: flex;
+			gap: 1em;
+			padding: 0.25em 0 0.25em 1em;
+		}
+
+		.news-list time {
+			color: #881900;
+			flex: 0 0 5.75em;
+			font-weight: 600;
+		}
+
+	.publication-list {
+		display: grid;
+		gap: 2.25em;
+	}
+
+	.publication-item {
+		align-items: start;
+		display: grid;
+		gap: 1.5em;
+		grid-template-columns: minmax(9em, 15em) minmax(0, 1fr);
+	}
+
+		.publication-item .publication-image {
+			aspect-ratio: 4 / 3;
+			background: #f7f7f7;
+			margin: 0;
+			overflow: hidden;
+		}
+
+			.publication-item .publication-image img {
+				height: 100%;
+				object-fit: contain;
+				padding: 0.35em;
+				width: 100%;
+			}
+
+		.publication-item h3 {
+			color: #333333;
+			font-size: 1.05em;
+			font-weight: 600;
+			line-height: 1.45em;
+			margin: 0 0 0.45em 0;
+		}
+
+		.publication-item p {
+			font-size: 0.95em;
+			line-height: 1.55em;
+			margin: 0.2em 0;
+		}
+
+		.publication-item .authors strong {
+			color: #111111;
+		}
+
+		.publication-item .venue {
+			color: #444444;
+			font-style: italic;
+			font-weight: 600;
+		}
+
+	.publication-links {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.75em;
+	}
+
+		.publication-links a {
+			border: solid 1px #d7d7d7;
+			border-radius: 0.35em;
+			color: #16856f;
+			font-size: 0.9em;
+			font-weight: 600;
+			line-height: 1;
+			padding: 0.45em 0.75em;
+		}
+
+			.publication-links a:hover {
+				background: #49bf9d;
+				border-color: #49bf9d;
+				color: #ffffff !important;
+			}
+
+	.metric {
+		color: #881900;
+		font-weight: 600;
+	}
+
+	.contact-card {
+		color: #666666;
+		font-style: normal;
+		line-height: 1.65em;
+	}
+
+		.contact-card span,
+		.contact-card a {
+			display: block;
+		}
+
 /* Header */
 
 	#header {
@@ -2668,7 +2829,7 @@ input, select, textarea {
 
 		#header .image.avatar {
 			margin: 0 0 1em 0;
-			width: 14em;
+			width: 11em;
 		}
 
 /* Footer */
@@ -3192,6 +3353,21 @@ input, select, textarea {
 					font-size: 1.35em;
 				}
 
+				#header .image.avatar {
+					width: 10em;
+				}
+
+				#nav ul {
+					display: flex;
+					flex-wrap: wrap;
+					gap: 0.75em 1.15em;
+					justify-content: center;
+				}
+
+				#nav li {
+					margin: 0;
+				}
+
 		/* Footer */
 
 			#footer {
@@ -3208,6 +3384,20 @@ input, select, textarea {
 					margin: 2.25em 0 0 0;
 					padding: 2.25em 0 0 0;
 				}
+
+			.news-list li,
+			.publication-item {
+				display: block;
+			}
+
+			.news-list time {
+				display: block;
+				margin: 0 0 0.25em 0;
+			}
+
+			.publication-item .publication-image {
+				margin: 0 0 1em 0;
+			}
 
 		/* Poptrox */
 
@@ -3233,7 +3423,7 @@ input, select, textarea {
 			}
 
 				#header h1 br {
-					display: none;
+					display: block;
 				}
 
 		/* Footer */
