@@ -55,3 +55,22 @@ Run the site locally and confirm:
 - filters still show the correct publication types;
 - the page has no horizontal scroll at desktop and mobile widths;
 - external paper, journal, code, and email links point to the intended destinations.
+
+## Bilingual content (added 2026-09)
+
+The header has a 中文 / English toggle. The choice is remembered in the browser and the first visit follows the browser language.
+
+- Any string field in `site-data.js` may carry a Chinese twin with the `Zh` suffix: `description` / `descriptionZh`, `text` / `textZh`, `label` / `labelZh`, `name` / `nameZh`, and so on. When the twin is missing the English value is shown in both languages.
+- Paper titles, author lists, and journal names stay in English by design.
+- Static interface text (navigation, headings, buttons, notes) lives in `SITE_DATA.ui.en` and `SITE_DATA.ui.zh`. Keep both dictionaries in sync when adding a key; the key maps to a `data-i18n` attribute in `index.html` or a label built in `main.js`.
+
+## Experience and addresses
+
+- `SITE_DATA.experience` renders under the Bio text, newest first. Each entry has `start` (ISO month), `period`, `role`, `organization`, `location`, plus optional `Zh` twins.
+- `SITE_DATA.addresses` renders in the footer as a grid. Each entry is a `lines` array (one line per element) with an optional `linesZh` array.
+- `SITE_DATA.profile` holds the Google Scholar, GitHub, and email links used in the hero and footer.
+
+## Optional publication fields
+
+- `volume`: shown under the year in the venue column, e.g. `"181, 124453"`.
+- `doi`: adds a DOI button next to the paper link.

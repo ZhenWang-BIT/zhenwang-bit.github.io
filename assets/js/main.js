@@ -7,11 +7,37 @@
 		throw new Error("SITE_DATA is unavailable. Check assets/js/site-data.js.");
 	}
 
-	var typeLabels = {
-		journal: "Journal article",
-		conference: "Conference paper",
-		preprint: "Preprint"
-	};
+	/* ------------------------------------------------------------------
+	   Language state
+	   ------------------------------------------------------------------ */
+
+	var lang = "en";
+
+	function detectLanguage() {
+		var saved = null;
+		try { saved = localStorage.getItem("lang"); } catch (error) { /* private mode */ }
+		if (saved === "zh" || saved === "en") {
+			return saved;
+		}
+		return /^zh/i.test(navigator.language || "") ? "zh" : "en";
+	}
+
+	// Static UI string by key.
+	function t(key) {
+		var dict = data.ui[lang] || {};
+		if (key in dict) {
+			return dict[key];
+		}
+		return data.ui.en[key] || key;
+	}
+
+	// Localised field of a data record: field + "Zh" when available in Chinese mode.
+	function L(record, field) {
+		if (lang === "zh" && record[field + "Zh"] != null) {
+			return record[field + "Zh"];
+		}
+		return record[field];
+	}
 
 	function escapeHTML(value) {
 		return String(value)
@@ -23,7 +49,9 @@
 	}
 
 	function formatAuthors(value) {
-		return escapeHTML(value).replace(/Zhen Wang/g, "<strong>Zhen Wang</strong>");
+		return escapeHTML(value).replace(/Zhen Wang\*?/g, function (match) {
+			return "<strong>" + match + "</strong>";
+		});
 	}
 
 	function byOrder(a, b) {
@@ -36,8 +64,8 @@
 
 	function metricReleaseLabel(metric) {
 		return metric.releaseYear
-			? metric.jifYear + " JIF · released " + metric.releaseYear
-			: metric.jifYear + " JIF";
+			? metric.jifYear + " " + t("jif.badge") + " · " + t("strip.released") + " " + metric.releaseYear
+			: metric.jifYear + " " + t("jif.badge");
 	}
 
 	function journalSummary() {
@@ -61,7 +89,7 @@
 	}
 
 	function paperLink(publication, compact) {
-		var label = publication.type === "preprint" ? "View preprint" : "View paper";
+		var label = publication.type === "preprint" ? t("pub.viewPreprint") : t("pub.viewPaper");
 		var className = compact ? "paper-link" : "button button-primary";
 		return (
 			'<a class="' + className + '" href="' + escapeHTML(publication.url) + '" target="_blank" rel="noopener">' +
@@ -71,14 +99,43 @@
 		);
 	}
 
+	/* ------------------------------------------------------------------
+	   Static text
+	   ------------------------------------------------------------------ */
+
+	function renderStaticText() {
+		document.querySelectorAll("[data-i18n]").forEach(function (element) {
+			element.innerHTML = t(element.getAttribute("data-i18n"));
+		});
+
+		document.documentElement.lang = lang === "zh" ? "zh-CN" : "en";
+		document.documentElement.setAttribute("data-lang", lang);
+		document.title = lang === "zh" ? "王震 | 电池智能研究者" : "Zhen Wang | Battery Intelligence Researcher";
+
+		var toggle = document.getElementById("lang-toggle");
+		if (toggle) {
+			toggle.setAttribute("aria-label", t("lang.switchAria"));
+		}
+
+		var newsToggle = document.getElementById("news-toggle");
+		if (newsToggle) {
+			var expanded = newsToggle.getAttribute("aria-expanded") === "true";
+			newsToggle.textContent = expanded ? t("news.showFewer") : t("news.showAll");
+		}
+	}
+
+	/* ------------------------------------------------------------------
+	   Sections
+	   ------------------------------------------------------------------ */
+
 	function renderResearchAreas() {
 		var container = document.getElementById("research-areas");
 		container.innerHTML = data.researchAreas.map(function (area) {
 			return (
 				'<article class="research-area">' +
 					'<span class="research-number">' + escapeHTML(area.number) + "</span>" +
-					"<h2>" + escapeHTML(area.name) + "</h2>" +
-					"<p>" + escapeHTML(area.description) + "</p>" +
+					"<h2>" + escapeHTML(L(area, "name")) + "</h2>" +
+					"<p>" + escapeHTML(L(area, "description")) + "</p>" +
 				"</article>"
 			);
 		}).join("");
@@ -90,13 +147,16 @@
 			return item.featured;
 		}).sort(byOrder)[0];
 		var metric = getMetric(publication);
-		var latest = data.news[0];
+		var latest = data.news.find(function (item) {
+			return item.publicationId === publication.id;
+		}) || data.news[0];
 
 		container.innerHTML =
+			'<span class="hud-corner" aria-hidden="true"></span>' +
 			'<div class="featured-label-row">' +
-				'<p class="eyebrow">Featured work</p>' +
+				'<p class="eyebrow">' + escapeHTML(t("featured.eyebrow")) + "</p>" +
 				(metric
-					? '<span class="metric-badge" aria-label="' + escapeHTML(metricReleaseLabel(metric)) + " " + escapeHTML(metric.impactFactor) + '"><span>' + escapeHTML(metric.jifYear) + ' JIF</span><strong>' + escapeHTML(metric.impactFactor) + "</strong></span>"
+					? '<span class="metric-badge" aria-label="' + escapeHTML(metricReleaseLabel(metric)) + " " + escapeHTML(metric.impactFactor) + '"><span>' + escapeHTML(metric.jifYear) + " " + escapeHTML(t("jif.badge")) + "</span><strong>" + escapeHTML(metric.impactFactor) + "</strong></span>"
 					: "") +
 			"</div>" +
 			"<h2><a href=\"" + escapeHTML(publication.url) + "\" target=\"_blank\" rel=\"noopener\">" + escapeHTML(publication.title) + "</a></h2>" +
@@ -106,8 +166,8 @@
 			"</a>" +
 			'<div class="featured-footer">' +
 				"<div>" +
-					'<p class="featured-description">' + escapeHTML(publication.description) + "</p>" +
-					'<p class="latest-marker">Online now · ' + escapeHTML(latest.label) + "</p>" +
+					'<p class="featured-description">' + escapeHTML(L(publication, "description")) + "</p>" +
+					'<p class="latest-marker">' + escapeHTML(t("featured.online")) + " · " + escapeHTML(L(latest, "label")) + "</p>" +
 				"</div>" +
 				paperLink(publication, false) +
 			"</div>";
@@ -118,9 +178,9 @@
 		var summary = journalSummary();
 
 		container.innerHTML =
-			'<span class="journal-summary-label">Total JIF</span>' +
+			'<span class="journal-summary-label">' + escapeHTML(t("strip.total")) + "</span>" +
 			'<strong class="journal-summary-value">' + escapeHTML(summary.total) + "</strong>" +
-			'<span class="journal-summary-detail">' + escapeHTML(summary.count) + " journal papers · each paper counted once</span>";
+			'<span class="journal-summary-detail">' + escapeHTML(summary.count) + " " + escapeHTML(t("strip.detail")) + "</span>";
 		container.setAttribute(
 			"aria-label",
 			"Total Journal Impact Factor " + summary.total + " across " + summary.count + " journal papers, counting each paper once"
@@ -148,17 +208,21 @@
 
 	function publicationVenue(publication) {
 		var metric = getMetric(publication);
+		var volume = publication.volume
+			? '<span class="publication-volume">' + escapeHTML(publication.volume) + "</span>"
+			: "";
 
 		if (metric) {
 			var releaseLine = metric.releaseYear
-				? "<br>Released " + escapeHTML(metric.releaseYear)
+				? '<span class="jif-release">' + escapeHTML(t("pub.released")) + " " + escapeHTML(metric.releaseYear) + "</span>"
 				: "";
 			return (
 				'<aside class="publication-venue" aria-label="Journal and impact factor">' +
 					'<span class="publication-venue-name">' + escapeHTML(publication.venue) + "</span>" +
 					'<span class="publication-year">' + escapeHTML(publication.year) + "</span>" +
+					volume +
 					'<strong class="publication-jif">' + escapeHTML(metric.impactFactor) + "</strong>" +
-					'<span class="publication-jif-label">' + escapeHTML(metric.jifYear) + " JIF" + releaseLine + "</span>" +
+					'<span class="publication-jif-label">' + escapeHTML(metric.jifYear) + " " + escapeHTML(t("jif.badge")) + releaseLine + "</span>" +
 				"</aside>"
 			);
 		}
@@ -167,41 +231,47 @@
 			'<aside class="publication-venue" aria-label="Publication type">' +
 				'<span class="publication-venue-name">' + escapeHTML(publication.venue) + "</span>" +
 				'<span class="publication-year">' + escapeHTML(publication.year) + "</span>" +
-				'<span class="publication-type-label">' + escapeHTML(typeLabels[publication.type]) + "</span>" +
+				'<span class="publication-type-label">' + escapeHTML(t("type." + publication.type)) + "</span>" +
 			"</aside>"
 		);
 	}
 
 	function publicationCard(publication, index) {
 		var codeLink = publication.codeUrl
-			? '<a class="paper-link" href="' + escapeHTML(publication.codeUrl) + '" target="_blank" rel="noopener"><span class="fas fa-code" aria-hidden="true"></span>Code</a>'
+			? '<a class="paper-link" href="' + escapeHTML(publication.codeUrl) + '" target="_blank" rel="noopener"><span class="fas fa-code" aria-hidden="true"></span>' + escapeHTML(t("pub.code")) + "</a>"
+			: "";
+		var doiLink = publication.doi
+			? '<a class="paper-link" href="https://doi.org/' + escapeHTML(publication.doi) + '" target="_blank" rel="noopener"><span class="fas fa-link" aria-hidden="true"></span>DOI</a>'
 			: "";
 
 		return (
-			'<article class="publication-item reveal" data-type="' + escapeHTML(publication.type) + '">' +
+			'<article class="publication-item reveal" data-type="' + escapeHTML(publication.type) + '" style="--i:' + index + '">' +
 				'<span class="publication-index">' + String(index + 1).padStart(2, "0") + "</span>" +
 				'<a class="publication-figure" href="' + escapeHTML(publication.url) + '" target="_blank" rel="noopener" aria-label="Open ' + escapeHTML(publication.title) + '">' +
 					'<img src="' + escapeHTML(publication.image) + '" alt="' + escapeHTML(publication.imageAlt) + '" width="' + publication.width + '" height="' + publication.height + '" loading="lazy">' +
 				"</a>" +
 				'<div class="publication-copy">' +
 					"<h3><a href=\"" + escapeHTML(publication.url) + "\" target=\"_blank\" rel=\"noopener\">" + escapeHTML(publication.title) + "</a></h3>" +
-					'<p class="publication-description">' + escapeHTML(publication.description) + "</p>" +
+					'<p class="publication-description">' + escapeHTML(L(publication, "description")) + "</p>" +
 					'<p class="publication-authors">' + formatAuthors(publication.authors) + "</p>" +
-					'<div class="publication-links">' + paperLink(publication, true) + codeLink + "</div>" +
+					'<div class="publication-links">' + paperLink(publication, true) + doiLink + codeLink + "</div>" +
 				"</div>" +
 				publicationVenue(publication) +
 			"</article>"
 		);
 	}
 
+	var currentFilter = "all";
+
 	function renderPublications(filter) {
+		currentFilter = filter || currentFilter;
 		var container = document.getElementById("publication-list");
 		var publications = data.publications.slice().sort(byOrder).filter(function (publication) {
-			return filter === "all" || publication.type === filter;
+			return currentFilter === "all" || publication.type === currentFilter;
 		});
 
 		if (!publications.length) {
-			container.innerHTML = '<p class="empty-state">No publications in this category yet.</p>';
+			container.innerHTML = '<p class="empty-state">' + escapeHTML(t("pub.empty")) + "</p>";
 			return;
 		}
 
@@ -214,19 +284,53 @@
 		container.innerHTML = data.news.map(function (news, index) {
 			var publication = news.publicationId ? publicationById(news.publicationId) : null;
 			var link = publication
-				? '<a href="' + escapeHTML(publication.url) + '" target="_blank" rel="noopener">Read paper</a>'
+				? '<a href="' + escapeHTML(publication.url) + '" target="_blank" rel="noopener">' + escapeHTML(t("news.read")) + "</a>"
 				: "<span></span>";
 			var extraClass = index >= 4 ? " is-extra" : "";
 
 			return (
 				'<article class="news-item' + extraClass + '">' +
-					'<time datetime="' + escapeHTML(news.date) + '">' + escapeHTML(news.label) + "</time>" +
-					"<p>" + escapeHTML(news.text) + "</p>" +
+					'<time datetime="' + escapeHTML(news.date) + '">' + escapeHTML(L(news, "label")) + "</time>" +
+					"<p>" + escapeHTML(L(news, "text")) + "</p>" +
 					link +
 				"</article>"
 			);
 		}).join("");
 	}
+
+	function renderExperience() {
+		var container = document.getElementById("experience-list");
+		if (!container || !data.experience) {
+			return;
+		}
+		container.innerHTML = data.experience.map(function (item) {
+			return (
+				'<article class="experience-item">' +
+					'<time datetime="' + escapeHTML(item.start) + '">' + escapeHTML(L(item, "period")) + "</time>" +
+					"<div>" +
+						"<strong>" + escapeHTML(L(item, "role")) + "</strong>" +
+						"<span>" + escapeHTML(L(item, "organization")) + "</span>" +
+						'<span class="experience-location">' + escapeHTML(L(item, "location")) + "</span>" +
+					"</div>" +
+				"</article>"
+			);
+		}).join("");
+	}
+
+	function renderAddresses() {
+		var container = document.getElementById("address-list");
+		if (!container || !data.addresses) {
+			return;
+		}
+		container.innerHTML = data.addresses.map(function (item) {
+			var lines = L(item, "lines");
+			return "<address>" + lines.map(escapeHTML).join("<br>") + "</address>";
+		}).join("");
+	}
+
+	/* ------------------------------------------------------------------
+	   Interaction
+	   ------------------------------------------------------------------ */
 
 	function setupFilters() {
 		var buttons = document.querySelectorAll(".filter-button");
@@ -255,8 +359,20 @@
 		button.addEventListener("click", function () {
 			var expanded = button.getAttribute("aria-expanded") === "true";
 			button.setAttribute("aria-expanded", String(!expanded));
-			button.textContent = expanded ? "Show all updates" : "Show fewer updates";
+			button.textContent = expanded ? t("news.showAll") : t("news.showFewer");
 			list.classList.toggle("is-expanded", !expanded);
+		});
+	}
+
+	function setupLanguageToggle() {
+		var button = document.getElementById("lang-toggle");
+		if (!button) {
+			return;
+		}
+		button.addEventListener("click", function () {
+			lang = lang === "zh" ? "en" : "zh";
+			try { localStorage.setItem("lang", lang); } catch (error) { /* ignore */ }
+			renderAll();
 		});
 	}
 
@@ -347,23 +463,32 @@
 	function setFooterMetadata() {
 		document.getElementById("current-year").textContent = new Date().getFullYear();
 		var updated = new Date(data.lastUpdated + "T00:00:00");
-		var formatted = updated.toLocaleDateString("en-US", {
+		var formatted = updated.toLocaleDateString(lang === "zh" ? "zh-CN" : "en-US", {
 			year: "numeric",
-			month: "short",
+			month: lang === "zh" ? "long" : "short",
 			day: "numeric"
 		});
-		document.getElementById("content-updated").textContent = "Content updated " + formatted;
+		document.getElementById("content-updated").textContent = t("footer.updated") + " " + formatted;
 	}
 
-	renderResearchAreas();
-	renderFeaturedPaper();
-	renderJournalSummary();
-	renderJournalMetrics();
-	renderPublications("all");
-	renderNews();
+	function renderAll() {
+		renderStaticText();
+		renderResearchAreas();
+		renderFeaturedPaper();
+		renderJournalSummary();
+		renderJournalMetrics();
+		renderPublications();
+		renderNews();
+		renderExperience();
+		renderAddresses();
+		setFooterMetadata();
+	}
+
+	lang = detectLanguage();
+	renderAll();
 	setupFilters();
 	setupNewsToggle();
+	setupLanguageToggle();
 	setupNavigation();
-	setFooterMetadata();
 	revealElements(document.querySelectorAll(".reveal:not(.publication-item)"));
 })();
