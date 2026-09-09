@@ -8,7 +8,7 @@
  * Paper titles, author lists, and journal names intentionally stay English.
  */
 window.SITE_DATA = {
-	lastUpdated: "2026-09-07",
+	lastUpdated: "2026-09-09",
 	metricChecked: "2026-09-07",
 
 	profile: {
@@ -125,8 +125,28 @@ window.SITE_DATA = {
 			height: 1600
 		},
 		{
-			id: "fragmented-charging-soh-2026",
+			id: "pouch-cell-layer-quantity-2026",
 			order: 3,
+			featured: false,
+			type: "journal",
+			theme: "Smart Batteries",
+			title: "The effect of electrode layer quantity on the electrochemical performance and swelling behavior of pouch cells",
+			authors: "Di Wu, Bo Rao, Shuaibang Liu, Jie Tian, Jinqiao Du, Yan Li, Yiding Li, Zhen Wang, Shipeng Liu, Yu Zhang, Wenwei Wang*, and Xiao-Guang Yang*",
+			venue: "Journal of Energy Storage",
+			year: "2026",
+			volume: "181, 124528",
+			doi: "10.1016/j.est.2026.124528",
+			description: "Reveals how the outermost anode coating governs performance and swelling in pouch cells with different electrode layer counts.",
+			descriptionZh: "揭示最外层负极涂层对不同电极层数软包电池电化学性能与膨胀行为的影响。",
+			url: "https://www.sciencedirect.com/science/article/pii/S2352152X26041927",
+			image: "images/8.png",
+			imageAlt: "Coin cell, multi-layer pouch cell and commercial pouch cell, with the layered electrode structure",
+			width: 1657,
+			height: 1300
+		},
+		{
+			id: "fragmented-charging-soh-2026",
+			order: 4,
 			featured: true,
 			type: "journal",
 			theme: "Fleet SOH",
@@ -144,7 +164,7 @@ window.SITE_DATA = {
 		},
 		{
 			id: "smart-battery-monitoring-2026",
-			order: 4,
+			order: 5,
 			featured: true,
 			type: "journal",
 			theme: "Smart Batteries",
@@ -162,7 +182,7 @@ window.SITE_DATA = {
 		},
 		{
 			id: "frequent-itemset-soh-2025",
-			order: 5,
+			order: 6,
 			featured: true,
 			type: "journal",
 			theme: "Fleet SOH",
@@ -180,7 +200,7 @@ window.SITE_DATA = {
 		},
 		{
 			id: "uv-m3tl-2026",
-			order: 6,
+			order: 7,
 			featured: false,
 			type: "preprint",
 			theme: "Multimodal Perception",
@@ -198,7 +218,7 @@ window.SITE_DATA = {
 		},
 		{
 			id: "tem3-learning-2025",
-			order: 7,
+			order: 8,
 			featured: false,
 			type: "conference",
 			theme: "Multimodal Perception",
@@ -217,7 +237,7 @@ window.SITE_DATA = {
 		},
 		{
 			id: "low-sampling-rate-soh-2024",
-			order: 8,
+			order: 9,
 			featured: false,
 			type: "journal",
 			theme: "Fleet SOH",
@@ -235,7 +255,7 @@ window.SITE_DATA = {
 		},
 		{
 			id: "ev-driving-cycle-2022",
-			order: 9,
+			order: 10,
 			featured: false,
 			type: "journal",
 			theme: "Vehicle Data",
@@ -294,6 +314,14 @@ window.SITE_DATA = {
 	],
 
 	news: [
+		{
+			date: "2026-09-08",
+			label: "Sep 8, 2026",
+			labelZh: "2026 年 9 月 8 日",
+			text: "Our Journal of Energy Storage paper on how electrode layer quantity shapes pouch-cell performance and swelling is available online.",
+			textZh: "关于电极层数对软包电池性能与膨胀行为影响的论文在 Journal of Energy Storage 上线。",
+			publicationId: "pouch-cell-layer-quantity-2026"
+		},
 		{
 			date: "2026-09-06",
 			label: "Sep 6, 2026",
